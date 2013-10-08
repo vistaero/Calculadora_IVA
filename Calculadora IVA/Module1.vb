@@ -30,31 +30,12 @@ Module Module1
             PedirIVA()
         End If
         Console.WriteLine("El IVA es de " & ivafile & "%")
-        Trabajo()
-    End Sub
 
-    Sub Trabajo()
-        Console.WriteLine("¿Qué desea hacer? Calcular precio | Cambiar IVA | Salir")
+
+        Console.WriteLine("¿Qué desea hacer? Calcular precios | Cambiar IVA | Salir")
         Select Case Console.ReadLine
             Case Is = "Calcular precio"
-                Console.WriteLine("¿A qué precio desea calcularle el IVA?")
-                ' Comenzar a hacer operaciones
-                Dim precio As Integer = 0
-                Dim ivafinal As Integer
-
-                Do Until precio > 0
-                    Dim respuestaprecio As String = Console.ReadLine
-
-                    Try
-                        precio = respuestaprecio
-                        ivafinal = precio / 100 * iva
-                        Console.WriteLine("El IVA de " & precio & " es " & ivafinal & ". Sumando un precio total de " & precio + ivafinal & ".")
-
-                    Catch ex As Exception
-
-                        Console.WriteLine("No ha introducido un número válido")
-                    End Try
-                Loop
+                Trabajo()
             Case Is = "Cambiar IVA"
                 Console.WriteLine("¿Qué IVA desea establecer?")
                 PedirIVA()
@@ -63,6 +44,33 @@ Module Module1
                 Environment.Exit(0)
 
         End Select
+        Main()
+
+
+    End Sub
+
+    Sub Trabajo()
+        Console.WriteLine("¿A qué precio desea calcularle el IVA?")
+        ' Comenzar a hacer operaciones
+        Dim precio As Integer = 0
+        Dim ivafinal As Integer
+
+        Do Until precio > 0
+            Dim respuestaprecio As String = Console.ReadLine
+            If respuestaprecio.Equals("Salir") Then
+                Main()
+
+            End If
+            Try
+                precio = respuestaprecio
+                ivafinal = precio / 100 * iva
+                Console.WriteLine("El IVA de " & precio & " es " & ivafinal & ". Sumando un precio total de " & precio + ivafinal & ".")
+
+            Catch ex As Exception
+
+                Console.WriteLine("No ha introducido un número válido")
+            End Try
+        Loop
         Trabajo()
 
     End Sub
