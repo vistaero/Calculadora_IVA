@@ -1,23 +1,45 @@
 ﻿
 Module Module1
 
-    Private ruta As String = IO.Path.GetDirectoryName(Diagnostics.Process.GetCurrentProcess().MainModule.FileName)
-    Private ivafile As String
-    Dim iva As Integer
+    Private rutaArchivoIVA As String = IO.Path.GetDirectoryName(Diagnostics.Process.GetCurrentProcess().MainModule.FileName) & IO.Path.DirectorySeparatorChar & "iva.txt"
+    Private contenidoArchivoIVA As String
+    Dim valorIVA As Double
 
     Sub Main()
         Console.Title = "Calculadora de IVA"
+        Do
+            Console.Clear()
+            CargarIVA()
+
+            Console.WriteLine("¿Qué desea hacer? 1. Calcular precio | 2. Cambiar IVA | 3. Salir")
+            Select Case Console.ReadLine
+                Case Is = "Calcular precio", "1"
+                    Trabajo()
+
+                Case Is = "Cambiar IVA", "2"
+                    PedirIVA()
+
+                Case Is = "Salir", "3"
+                    Environment.Exit(0)
+
+            End Select
+        Loop
+
+
+    End Sub
+
+    Private Sub CargarIVA()
         ' Comprobar si existe un archivo para guardar el IVA, y si es correcto.
-        If System.IO.File.Exists(ruta & "\iva.txt") Then
-            ivafile = System.IO.File.ReadAllText(ruta & "\iva.txt")
-            Do Until iva > 0
-                If ivafile.LongCount > 2 Then
+        If System.IO.File.Exists(rutaArchivoIVA) Then
+            contenidoArchivoIVA = System.IO.File.ReadAllText(rutaArchivoIVA)
+            Do Until valorIVA > 0
+                If contenidoArchivoIVA.LongCount > 2 Then
                     ' Error porque el IVA no puede tener más de 2 cifras.
                     Console.WriteLine("El IVA almacenado es inválido. ¿Con qué cantidad de IVA desea trabajar?")
                     PedirIVA()
                 Else
                     Try
-                        iva = ivafile
+                        valorIVA = contenidoArchivoIVA
                     Catch ex As Exception
                         ' Error porque el archivo contiene carácteres no numéricos.
                         Console.WriteLine("El IVA almacenado es inválido. ¿Con qué cantidad de IVA desea trabajar?")
@@ -29,70 +51,57 @@ Module Module1
             Console.WriteLine("¿Con qué cantidad de IVA desea trabajar?")
             PedirIVA()
         End If
-        Console.WriteLine("El IVA es de " & ivafile & "%")
+        Console.WriteLine("El IVA es de " & contenidoArchivoIVA & "%")
+
+    End Sub
+
+    Sub PedirIVA()
+        Console.Clear()
+
+        Do
+            Console.WriteLine("¿Qué IVA desea establecer?")
+
+            Try
+                valorIVA = Console.ReadLine()
+                System.IO.File.WriteAllText(rutaArchivoIVA, valorIVA)
+                Return
+
+            Catch ex As Exception
+                Console.WriteLine(ex.Message)
+            End Try
 
 
-        Console.WriteLine("¿Qué desea hacer? Calcular precios | Cambiar IVA | Salir")
-        Select Case Console.ReadLine
-            Case Is = "Calcular precio"
-                Trabajo()
-            Case Is = "Cambiar IVA"
-                Console.WriteLine("¿Qué IVA desea establecer?")
-                PedirIVA()
-                Main()
-            Case Is = "Salir"
-                Environment.Exit(0)
-
-        End Select
-        Main()
+        Loop
 
 
     End Sub
 
     Sub Trabajo()
-        Console.WriteLine("¿A qué precio desea calcularle el IVA?")
-        ' Comenzar a hacer operaciones
-        Dim precio As Integer = 0
-        Dim ivafinal As Integer
+        Console.Clear()
 
-        Do Until precio > 0
-            Dim respuestaprecio As String = Console.ReadLine
-            If respuestaprecio.Equals("Salir") Then
-                Main()
+        Do
+            Console.WriteLine("¿A qué precio desea calcularle el IVA? escriba Salir para volver al menú.")
 
-            End If
-            Try
-                precio = respuestaprecio
-                ivafinal = precio / 100 * iva
-                Console.WriteLine("El IVA de " & precio & " es " & ivafinal & ". Sumando un precio total de " & precio + ivafinal & ".")
+            Dim precio As Double = 0
+            Dim ivafinal As Double
 
-            Catch ex As Exception
+            Do Until precio > 0
+                Dim respuestaprecio As String = Console.ReadLine
+                If respuestaprecio.Equals("Salir") Then
+                    Main()
 
-                Console.WriteLine("No ha introducido un número válido")
-            End Try
+                End If
+                Try
+                    precio = respuestaprecio
+                    ivafinal = precio / 100 * valorIVA
+                    Console.WriteLine("El IVA de " & precio & " es " & ivafinal & ". Sumando un precio total de " & precio + ivafinal & ".")
+
+                Catch ex As Exception
+
+                    Console.WriteLine("No ha introducido un número válido")
+                End Try
+            Loop
         Loop
-        Trabajo()
-
-    End Sub
-
-    Sub PedirIVA()
-        ivafile = Console.ReadLine()
-        If ivafile.LongCount > 2 Then
-            Console.WriteLine("¿Estamos locos? ¿Un IVA tan grande? dime el correcto.")
-            PedirIVA()
-        Else
-            Try
-                System.IO.File.WriteAllText(ruta & "\iva.txt", ivafile)
-            Catch ex As Exception
-                Console.WriteLine(ex.Message)
-            End Try
-            Try
-                iva = ivafile
-            Catch ex As Exception
-                Console.WriteLine("Escríbemelo en números")
-                PedirIVA()
-            End Try
-        End If
 
     End Sub
 
